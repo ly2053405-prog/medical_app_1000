@@ -1,0 +1,53 @@
+[build]
+  command   = "vite build"
+  publish   = "dist"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# SPA fallback — all routes served by index.html
+[[redirects]]
+  from   = "/*"
+  to     = "/index.html"
+  status = 200
+
+# ── Netlify Functions (Gemini API proxy) ──────────────────────────────────────
+# Each Express route in server.ts becomes a separate Netlify Function.
+# Place them in /netlify/functions/<name>.ts
+# Example: POST /api/triage  →  netlify/functions/triage.ts
+#
+# Redirect API calls to the matching function:
+[[redirects]]
+  from   = "/api/triage"
+  to     = "/.netlify/functions/triage"
+  status = 200
+
+[[redirects]]
+  from   = "/api/smart-summary"
+  to     = "/.netlify/functions/smart-summary"
+  status = 200
+
+[[redirects]]
+  from   = "/api/triage-questions"
+  to     = "/.netlify/functions/triage-questions"
+  status = 200
+
+[[redirects]]
+  from   = "/api/health-assessment"
+  to     = "/.netlify/functions/health-assessment"
+  status = 200
+
+[[redirects]]
+  from   = "/api/chat"
+  to     = "/.netlify/functions/chat"
+  status = 200
+
+[[redirects]]
+  from   = "/api/check-interactions"
+  to     = "/.netlify/functions/check-interactions"
+  status = 200
+
+[[redirects]]
+  from   = "/api/classify"
+  to     = "/.netlify/functions/classify"
+  status = 200
