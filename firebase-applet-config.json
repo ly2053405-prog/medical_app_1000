@@ -1,0 +1,75 @@
+import { useState, useEffect, useRef, Dispatch, SetStateAction } from 'react';
+import { db, auth } from './firebase';
+import { doc, setDoc, onSnapshot } from 'firebase/firestore';
+import { onAuthStateChanged } from 'firebase/auth';
+
+export function useFirebaseState<T>(key: string, defaultValue: T): [T, Dispatch<SetStateAction<T>>] {
+  const [state, setState] = useState<T>(() => {
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem(key);
+      if (stored) {
+        try {
+          return JSON.parse(stored);
+        } catch (e) {
+          console.error(`Error parsing localStorage for key: ${key}`, e);
+          return defaultValue;
+        }
+      }
+    }
+    return defaultValue;
+  });
+
+  const isInitialMount = useRef(true);
+
+  // Sync from Firebase
+  useEffect(() => {
+    let unsubscribe: () => void;
+    // We only wait for auth state change
+    const authUnsub = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        console.log(`Syncing '${key}' from Firebase...`);
+        const docRef = doc(db, 'users', user.uid, 'store', key);
+        unsubscribe = onSnapshot(docRef, (snap) => {
+          if (snap.exists() && snap.data().value !== undefined) {
+             const data = snap.data().value;
+             setState(data);
+             // Also store locally for fast boot
+             localStorage.setItem(key, JSON.stringify(data));
+          } else {
+             // Create it initially using current state
+             setDoc(docRef, { value: state }, { merge: true }).catch(console.error);
+          }
+        }, (error) => {
+          console.error(`Error listening to Firebase state for ${key}`, error);
+        });
+      }
+    });
+
+    return () => {
+      authUnsub();
+      if (unsubscribe) unsubscribe();
+    };
+  }, [key]);
+
+  // Sync to Firebase
+  useEffect(() => {
+    if (isInitialMount.current) {
+       isInitialMount.current = false;
+       return;
+    }
+    
+    // Save to local storage
+    localStorage.setItem(key, JSON.stringify(state));
+    
+    // Save to Firebase
+    const user = auth.currentUser;
+    if (user) {
+      const docRef = doc(db, 'users', user.uid, 'store', key);
+      setDoc(docRef, { value: state }, { merge: true }).catch((err) => {
+        console.error(`Error saving ${key} to Firebase:`, err);
+      });
+    }
+  }, [key, state]);
+
+  return [state, setState];
+}

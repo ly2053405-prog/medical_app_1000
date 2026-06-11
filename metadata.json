@@ -1,0 +1,137 @@
+{
+  "entities": {
+    "userProfile": {
+      "title": "User Profile",
+      "description": "Profile info containing emergency data",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string" },
+        "emergencyProfile": {
+          "type": "object",
+          "properties": {
+            "bloodType": { "type": "string" },
+            "allergies": { "type": "string" },
+            "chronicDiseases": { "type": "string" },
+            "emergencyContact": { "type": "string" },
+            "additionalInfo": { "type": "string" }
+          }
+        }
+      },
+      "required": ["uid"]
+    },
+    "medicalEvent": {
+      "title": "Medical Event",
+      "description": "Event in history",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "date": { "type": "string" },
+        "description": { "type": "string" },
+        "status": { "type": "string" },
+        "category": { "type": "string" },
+        "isArchived": { "type": "boolean" },
+        "isFavorite": { "type": "boolean" },
+        "attachments": { "type": "array" }
+      },
+      "required": ["userId", "date", "description"]
+    },
+    "appointment": {
+      "title": "Appointment Record",
+      "description": "Doctor appointments",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "doctorName": { "type": "string" },
+        "specialty": { "type": "string" },
+        "date": { "type": "string" },
+        "time": { "type": "string" },
+        "notes": { "type": "string" }
+      },
+      "required": ["userId", "date"]
+    },
+    "vitalRecord": {
+      "title": "Vital Record",
+      "description": "Vital signs recordings",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "date": { "type": "string" },
+        "bloodPressureSys": { "type": "string" },
+        "bloodPressureDia": { "type": "string" },
+        "heartRate": { "type": "string" },
+        "temperature": { "type": "string" },
+        "weight": { "type": "string" }
+      },
+      "required": ["userId", "date"]
+    },
+    "labRecord": {
+      "title": "Lab Record",
+      "description": "Laboratory tracking",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "date": { "type": "string" },
+        "markerName": { "type": "string" },
+        "value": { "type": "string" },
+        "unit": { "type": "string" }
+      },
+      "required": ["userId", "date", "markerName"]
+    },
+    "medication": {
+      "title": "Medication Record",
+      "description": "Medications",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "name": { "type": "string" },
+        "dosage": { "type": "string" },
+        "frequency": { "type": "string" }
+      },
+      "required": ["userId", "name"]
+    },
+    "symptom": {
+      "title": "Symptom Record",
+      "description": "Symptoms tracking",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "date": { "type": "string" },
+        "symptom": { "type": "string" },
+        "severity": { "type": "number" },
+        "notes": { "type": "string" }
+      },
+      "required": ["userId", "date", "symptom"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "userProfile",
+      "description": "User profiles"
+    },
+    "/users/{userId}/events/{eventId}": {
+      "schema": "medicalEvent",
+      "description": "User medical events"
+    },
+    "/users/{userId}/appointments/{appointmentId}": {
+      "schema": "appointment",
+      "description": "User appointments"
+    },
+    "/users/{userId}/vitals/{vitalId}": {
+      "schema": "vitalRecord",
+      "description": "User vital records"
+    },
+    "/users/{userId}/labRecords/{labRecordId}": {
+      "schema": "labRecord",
+      "description": "User lab records"
+    },
+    "/users/{userId}/medications/{medicationId}": {
+      "schema": "medication",
+      "description": "User medications"
+    },
+    "/users/{userId}/symptoms/{symptomId}": {
+      "schema": "symptom",
+      "description": "User symptoms"
+    }
+  }
+}
